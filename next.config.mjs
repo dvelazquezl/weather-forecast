@@ -2,7 +2,15 @@
 const nextConfig = {
   reactStrictMode: true,
   env: {
-    openWeatherApiKey: process.env.OPENWEATHER_API_KEY,
+    openWeatherAppId: process.env.OPENWEATHER_APPID,
+  },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "openweathermap.org",
+      },
+    ],
   },
 };
 

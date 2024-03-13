@@ -1,9 +1,15 @@
 import Location from "@/pages/models/location";
+import Weather from "@/pages/models/weather";
 import axios from "axios";
 
 const baseURL = "https://api.openweathermap.org";
-const appid = process.env.openWeatherApiKey;
+const appid = process.env.openWeatherAppId;
 
+/**
+ * Retrieves geocoding information for a given city.
+ * @param {string} city - The name of the city.
+ * @returns {Promise<Location>} A promise that resolves to a Location object representing the geocoding information.
+ */
 export async function getGeocoding(city) {
   if (!city) {
     return new Location();
@@ -16,7 +22,6 @@ export async function getGeocoding(city) {
         appid,
       },
     });
-    console.log("full response", response.data);
     if (response.data.length === 0) {
       throw Error("No location found");
     }
@@ -27,6 +32,27 @@ export async function getGeocoding(city) {
   }
 }
 
-export function getCurrentForecast(params) {
-  return axios.get("data/3.0/onecall", params);
+/**
+ * Retrieves the current weather forecast for a given location.
+ *
+ * @param {Object} location - The location object containing latitude and longitude.
+ * @returns {Promise<Weather|Error>} - A promise that resolves to a Weather object representing the current forecast,
+ *                                      or rejects with an Error if no weather data is found.
+ */
+export async function getCurrentForecast(location) {
+  try {
+    const response = await axios.get(`${baseURL}/data/3.0/onecall`, {
+      params: {
+        lat: location.latitude,
+        lon: location.longitude,
+        exclude: "minutely,hourly,daily,alerts",
+        units: "metric",
+        appid,
+      },
+    });
+    return new Weather(response.data);
+  } catch (error) {
+    console.error(error);
+    return Error("No weather data found");
+  }
 }
