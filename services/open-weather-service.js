@@ -33,6 +33,33 @@ export async function getGeocoding(city) {
 }
 
 /**
+ * Retrieves reverse geocoding information for a given location.
+ *
+ * @param {Object} location - The location object containing latitude and longitude.
+ * @returns {Promise<Location>} - A promise that resolves to a Location object representing the reverse geocoding information.
+ * @throws {Error} - If no location is found.
+ */
+export async function getReverseGeocoding(location) {
+  try {
+    const response = await axios.get(`${baseURL}/geo/1.0/reverse`, {
+      params: {
+        lat: location.latitude,
+        lon: location.longitude,
+        limit: 1,
+        appid,
+      },
+    });
+    if (response.data.length === 0) {
+      throw Error("No location found");
+    }
+    return new Location(response.data[0]);
+  } catch (error) {
+    console.error(error);
+    return new Location();
+  }
+}
+
+/**
  * Retrieves the current weather forecast for a given location.
  *
  * @param {Object} location - The location object containing latitude and longitude.
