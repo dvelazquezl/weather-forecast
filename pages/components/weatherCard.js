@@ -4,10 +4,11 @@ import {
   getGeocoding,
   getReverseGeocoding,
 } from "@/services/open-weather-service";
-import { Card, Label, Spinner, TextInput, Tooltip } from "flowbite-react";
+import { Card, Spinner, TextInput, Tooltip } from "flowbite-react";
 import Image from "next/image";
 import Weather from "../models/weather";
 import Location from "../models/location";
+import CustomChart from "./chart";
 
 export default function WeatherCard() {
   const dateTime = new Date().toLocaleDateString("en-US", {
@@ -23,12 +24,10 @@ export default function WeatherCard() {
   const [loading, setLoading] = useState(false);
   const [location, setLocation] = useState(new Location());
   const [weather, setWeather] = useState(new Weather());
+  const [chartData, setChartData] = useState({ labels: [], temperatures: [] });
 
   useEffect(() => {
-    if (!navigator.geolocation) {
-      console.error("Geolocation is not supported by your browser");
-      return new Location();
-    } else {
+    if (navigator.geolocation) {
       setGettingCurrentLocation(true);
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -37,16 +36,12 @@ export default function WeatherCard() {
             longitude: position.coords.longitude,
           })
             .then(setLocation)
-            .catch((error) => {
-              console.error(error);
-              return new Location();
-            })
+            .catch(console.error)
             .finally(() => setGettingCurrentLocation(false));
         },
         (error) => {
           console.error(error);
           setGettingCurrentLocation(false);
-          return new Location();
         }
       );
     }
@@ -55,6 +50,13 @@ export default function WeatherCard() {
   useEffect(() => {
     getCurrentForecast(location).then(setWeather).catch(console.error);
   }, [location]);
+
+  useEffect(() => {
+    setChartData({
+      labels: weather.hourly?.map((hour) => hour.time),
+      temperatures: weather.hourly?.map((hour) => hour.temperature),
+    });
+  }, [weather]);
 
   const handleSearch = (event) => {
     if (event.key !== "Enter") return;
@@ -110,7 +112,7 @@ export default function WeatherCard() {
                   <p className="capitalize text-xs">{weather?.description}</p>
                 </div>
                 <Image
-                  src={weather?.getIconImage()}
+                  src={weather.getIconImage()}
                   alt=""
                   width={100}
                   height={100}
@@ -128,8 +130,11 @@ export default function WeatherCard() {
               </div>
             </div>
           </div>
-          <div className="bg-emerald-300">
-            <p>CHART</p>
+          <div className="col-span-2">
+            <CustomChart
+              labels={chartData.labels}
+              temperatures={chartData.temperatures}
+            />
           </div>
         </div>
       )}

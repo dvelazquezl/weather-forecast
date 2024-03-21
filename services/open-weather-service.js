@@ -72,7 +72,7 @@ export async function getCurrentForecast(location) {
       params: {
         lat: location.latitude,
         lon: location.longitude,
-        exclude: "minutely,hourly,daily,alerts",
+        exclude: "minutely,daily,alerts",
         units: "metric",
         appid,
       },
