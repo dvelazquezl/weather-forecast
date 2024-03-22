@@ -1,5 +1,5 @@
 import { Montserrat } from "next/font/google";
-import WeatherCard from "./components/weatherCard";
+import WeatherCard from "@/components/weatherCard";
 
 const montserrat = Montserrat({ subsets: ["latin"] });
 

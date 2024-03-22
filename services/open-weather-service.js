@@ -1,5 +1,5 @@
-import Location from "@/pages/models/location";
-import Weather from "@/pages/models/weather";
+import Location from "@/models/location";
+import Weather from "@/models/weather";
 import axios from "axios";
 
 const baseURL = "https://api.openweathermap.org";
